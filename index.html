@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f4fbf">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Due lingue</title>
+<style>
+/* VOICE: calm study notebook for the metro
+   IDEA: two exercise books, one per language, each with its own cover colour
+   PICTURE: the open lesson itself, reader text and exercise rows
+   COLOUR and TYPE: Italian = azure, Spanish = brick red; system UI font, serif for reading (works offline)
+   LAYOUT: cover band, tabs, one column on phones, two on tablets */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#121417);--ink:light-dark(#15171c,#eceef2);--mute:light-dark(#5d6370,#9aa1ad);
+--line:light-dark(#e3e5ea,#2a2e35);--card:light-dark(#f6f7f9,#1b1e23);
+--a:#1f4fbf;--a2:light-dark(#e6edfb,#1a2742);--acc:#f2b705;--ok:#1d8a4e;--bad:#c2362b;--near:#b07800;
+--serif:Georgia,"Times New Roman",serif}
+body.es{--a:#c2362b;--a2:light-dark(#fbe9e6,#3a1d1a)}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+.cover{background:var(--a);color:#fff;padding:calc(14px + env(safe-area-inset-top)) max(5vw,16px) 0}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;max-width:1100px;margin:auto}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.05;margin:0;font-weight:700}
+h1 small{display:block;font-size:14px;font-weight:400;opacity:.85;margin-top:5px}
+.sw{display:flex;background:rgba(0,0,0,.22);border-radius:999px;padding:4px}
+.sw button{border:0;background:none;color:#fff;padding:10px 16px;border-radius:999px;min-height:44px;cursor:pointer}
+.sw button.on{background:#fff;color:var(--a);font-weight:700}
+.tabs{display:flex;gap:4px;max-width:1100px;margin:14px auto 0;overflow-x:auto}
+.tabs button{border:0;background:none;color:#fff;opacity:.8;padding:12px 14px;min-height:44px;border-radius:10px 10px 0 0;cursor:pointer;flex:none}
+.tabs button.on{background:var(--bg);color:var(--ink);opacity:1;font-weight:700}
+main{max-width:1100px;margin:auto;padding:20px max(5vw,16px) 140px}
+.lessons{display:flex;gap:8px;overflow-x:auto;margin-bottom:18px;padding-bottom:4px}
+.chip{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:999px;min-height:44px;cursor:pointer;flex:none}
+.chip.on{background:var(--a2);border-color:var(--a);font-weight:700}
+.grid{display:grid;gap:28px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.grid{grid-template-columns:minmax(0,3fr) minmax(0,2fr)}}
+h2{font-size:22px;margin:0 0 10px;line-height:1.2}
+h3{font-size:17px;margin:22px 0 4px}
+.read{font:19px/1.75 var(--serif);max-width:65ch}
+.read p{margin:0 0 1em}
+.w{cursor:pointer;border-radius:4px;padding:0 1px}
+.w:hover{background:var(--a2)}.w.sel{background:var(--acc);color:#15171c}
+.w.saved{text-decoration:underline 2px var(--a);text-underline-offset:4px}
+.note{color:var(--mute);font-size:14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:14px 0}
+.ex{border-top:1px solid var(--line);padding:14px 0}
+.ex .q{margin-bottom:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text],input[type=password],input:not([type]){flex:1 1 200px;font-size:16px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);min-height:44px}
+input:focus,button:focus-visible,summary:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+.btn{border:0;background:var(--a);color:#fff;padding:10px 16px;border-radius:10px;min-height:44px;cursor:pointer;font-weight:500}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:6px 12px;min-height:36px;font-size:14px}
+.fb{margin-top:6px;font-size:15px}
+.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}.fb.near{color:var(--near)}
+.ex.ok input{border-color:var(--ok)}.ex.bad input{border-color:var(--bad)}.ex.near input{border-color:var(--near)}
+.ai{margin-top:8px;padding:10px 12px;border-left:3px solid var(--a);background:var(--a2);border-radius:0 8px 8px 0;font-size:15px}
+.score{display:flex;align-items:center;gap:12px;margin:6px 0 4px}
+.bar{flex:1;height:8px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--a)}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:3px solid var(--a);box-shadow:0 -8px 30px rgba(0,0,0,.18);padding:16px max(5vw,16px) calc(16px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .2s;z-index:5}
+.sheet.open{transform:none}
+.sheet .in{max-width:1100px;margin:auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.sheet b{font:600 22px var(--serif)}.sheet .tr{flex:1 1 200px;font-size:17px}
+table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:500;color:var(--mute);font-size:14px}
+.x{border:0;background:none;color:var(--mute);cursor:pointer;min-height:44px;min-width:44px;font-size:20px}
+label{display:block;font-weight:600;margin:14px 0 6px}
+pre{overflow-x:auto;background:var(--card);padding:12px;border-radius:10px;font-size:13px}
+.off{display:none;background:#15171c;color:#fff;text-align:center;font-size:14px;padding:6px}
+body.offline .off{display:block}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(max-width:600px){.read{font-size:18px}}
+</style>
+</head>
+<body class="it">
+<div class="off">Нет сети: всё работает, проверки ИИ ждут в очереди</div>
+<header class="cover">
+  <div class="top">
+    <h1 id="title">Italiano<small>Тетрадь итальянского</small></h1>
+    <div class="sw" aria-label="Язык">
+      <button data-l="it" class="on">Italiano</button>
+      <button data-l="es">Español</button>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button data-t="read" class="on">Урок</button>
+    <button data-t="words">Слова</button>
+    <button data-t="import">Файлы</button>
+    <button data-t="settings">Настройки</button>
+  </nav>
+</header>
+<main id="main"></main>
+<div class="sheet" id="sheet" aria-live="polite">
+  <div class="in"><b id="sw-word"></b><span class="tr" id="sw-tr"></span>
+  <button class="btn" id="sw-save">В мои слова</button><button class="x" id="sw-close" aria-label="Закрыть">×</button></div>
+</div>
+<script>
+{
+/* ---------- demo content (own texts, replaced by imported lessons) ---------- */
+const DEMO={
+it:[{id:'demo-it',title:'Демо. Al bar',src:'Пример. Загрузи уроки из учебника во вкладке «Файлы».',
+ text:["Ogni mattina Marta va al bar vicino alla stazione. Il barista si chiama Paolo ed è molto simpatico.","Marta ordina un caffè e un cornetto."],
+ dict:{ogni:'каждый',mattina:'утро',marta:'Марта',va:'идёт',al:'в (a + il)',bar:'бар',vicino:'рядом',alla:'к (a + la)',stazione:'вокзал',il:'(арт. м. р.)',barista:'бариста',si:'себя',chiama:'зовёт; si chiama — зовут',paolo:'Паоло',ed:'и','è':'есть (essere)',molto:'очень',simpatico:'приятный',ordina:'заказывает',un:'(неопр. арт.)','caffè':'кофе',e:'и',cornetto:'круассан'},
+ ex:[{task:'Глагол essere',items:[{q:'Io ___ in ritardo.',a:['sono']},{q:'Paolo ___ simpatico.',a:['è']}]},{task:'Переведите',items:[{q:'Сегодня холодно.',a:['Oggi fa freddo.'],open:true}]}]}],
+es:[{id:'demo-es',title:'Демо. En el mercado',src:'Пример. Загрузи уроки во вкладке «Файлы».',
+ text:["Los sábados Inés va al mercado con su abuela. Compran fruta, pan y un poco de queso."],
+ dict:{los:'(арт. мн.)','sábados':'субботы','inés':'Инес',va:'идёт',al:'в (a + el)',mercado:'рынок',con:'с',su:'её',abuela:'бабушка',compran:'покупают',fruta:'фрукты',pan:'хлеб',y:'и',un:'(неопр. арт.)',poco:'немного',de:'из',queso:'сыр'},
+ ex:[{task:'Ser / estar',items:[{q:'La vendedora ___ amable. (ser)',a:['es']},{q:'La naranja ___ buenísima. (estar)',a:['está']}]},{task:'Переведите',items:[{q:'Немного сыра.',a:['Un poco de queso.'],open:true}]}]}]};
+const NAMES={it:['Italiano','Тетрадь итальянского','italiano'],es:['Español','Тетрадь испанского','spagnolo / español']};
+
+/* ---------- storage ---------- */
+let st={lang:'it',tab:'read',les:{},saved:{it:[],es:[]},done:{},vals:{},ai:{},queue:[],cfg:{url:'https://api.deepseek.com',model:'deepseek-chat',key:''}};
+try{const s=JSON.parse(localStorage.getItem('dueLingue2')||'null');if(s)st=Object.assign(st,s,{cfg:Object.assign(st.cfg,s.cfg||{})})}catch(e){}
+const save=()=>{try{localStorage.setItem('dueLingue2',JSON.stringify(st))}catch(e){toast('Не удалось сохранить прогресс')}};
+const DB={};
+const db=new Promise((res,rej)=>{const r=indexedDB.open('dueLingue',1);r.onupgradeneeded=()=>{r.result.createObjectStore('lessons');r.result.createObjectStore('audio')};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const idb=(store,mode,fn)=>db.then(d=>new Promise((res,rej)=>{const t=d.transaction(store,mode);const q=fn(t.objectStore(store));t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}));
+let LESSONS={it:[],es:[]};const audioUrl={};const hasAudio=new Set();
+
+/* ---------- helpers ---------- */
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const lessons=()=>LESSONS[st.lang].length?LESSONS[st.lang]:DEMO[st.lang];
+const cur=()=>lessons().find(l=>l.id===st.les[st.lang])||lessons()[0];
+const groups=l=>(l.ex||[]).length&&l.ex[0].items?l.ex:[{task:'',items:l.ex||[]}];
+const flat=l=>groups(l).flatMap(g=>g.items);
+const norm=s=>s.trim().toLowerCase().replace(/[’`´]/g,"'").replace(/\s+/g,' ').replace(/[.!?¡¿,;:«»"—–-]/g,' ').replace(/\s+/g,' ').trim();
+const noAcc=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'');
+function check(ex,val){const v=norm(val);if(!v)return null;
+  if(ex.a.some(a=>norm(a)===v))return'ok';if(ex.a.some(a=>noAcc(norm(a))===noAcc(v)))return'near';return'bad'}
+function toast(t){const n=document.createElement('div');n.textContent=t;n.style.cssText='position:fixed;left:50%;top:16px;transform:translateX(-50%);background:#15171c;color:#fff;padding:10px 16px;border-radius:10px;z-index:9;font-size:15px;max-width:90vw';document.body.append(n);setTimeout(()=>n.remove(),3000)}
+
+/* ---------- render ---------- */
+function renderText(l){const saved=new Set(st.saved[st.lang].map(w=>w.w));
+  return l.text.map(p=>'<p>'+esc(p).replace(/[\p{L}]+'?/gu,m=>{const k=m.toLowerCase();return`<span class="w${saved.has(k)?' saved':''}" data-w="${esc(k)}">${m}</span>`})+'</p>').join('')}
+function aiBlock(l,i,e){const r=(st.ai[l.id]||{})[i];
+  if(r==='queued')return'<div class="ai">В очереди на проверку ИИ: отправлю, когда появится сеть.</div>';
+  if(r==='wait')return'<div class="ai">ИИ проверяет…</div>';
+  if(r&&r.verdict){const lab={ok:'ИИ: верно',minor:'ИИ: почти верно',wrong:'ИИ: есть ошибка'}[r.verdict]||'ИИ';
+    return`<div class="ai"><b>${lab}.</b> ${esc(r.explain||'')}${r.correct&&r.verdict!=='ok'?`<br>Правильно: <i>${esc(r.correct)}</i>`:''}</div>`}
+  if(r&&r.error)return`<div class="ai">Не получилось проверить: ${esc(r.error)}</div>`;
+  return''}
+function fbText(r,e,i){
+  const aiBtn=`<button class="btn ghost sm" data-ai="${i}">Спросить ИИ</button>`;
+  if(r==='ok')return'Верно!';
+  if(r==='near')return'Почти: проверь ударения и апострофы. '+(e.open?aiBtn:'');
+  if(r==='bad')return`${e.open?'Не совпало с эталоном, но перевод бывает верным и по-другому.':'Пока нет.'} <button class="btn ghost sm" data-show="${i}">Ответ</button> ${e.open?aiBtn:''}`;
+  return''}
+function renderRead(){
+  const l=cur();const done=st.done[l.id]||{};const vals=st.vals[l.id]||{};const all=flat(l);
+  const ok=all.filter((e,i)=>done[i]==='ok').length;let k=0;
+  return`<div class="lessons">${lessons().map(x=>`<button class="chip${x.id===l.id?' on':''}" data-les="${esc(x.id)}">${esc(x.title)}</button>`).join('')}</div>
+  <div class="grid"><section><h2>${esc(l.title)}</h2>${l.src?`<p class="note" style="margin-top:-6px">${esc(l.src)}</p>`:''}
+  ${hasAudio.has(l.id)?`<audio controls preload="none" id="aud" style="width:100%;margin:4px 0 14px"></audio>`:''}
+  <div class="read">${renderText(l)}</div><p class="note">Нажми на слово, чтобы увидеть перевод.</p>
+  ${l.words&&l.words.length?`<details class="box" open><summary><b>Слова урока</b> · ${l.words.length}</summary><table><tbody>${l.words.map(w=>`<tr><td style="font-family:var(--serif)">${esc(w[0])}</td><td>${esc(w[1])}</td></tr>`).join('')}</tbody></table></details>`:''}
+  ${l.grammar&&l.grammar.length?`<details class="box"><summary><b>Грамматика</b></summary><ol>${l.grammar.map(g=>`<li style="margin:8px 0">${esc(g)}</li>`).join('')}</ol></details>`:''}
+  </section><section><h2>Упражнения</h2>
+  <div class="score"><div class="bar"><i style="width:${all.length?ok/all.length*100:0}%"></i></div><span id="sc">${ok} из ${all.length}</span></div>
+  ${groups(l).map(g=>`${g.task?`<h3>${esc(g.task)}</h3>`:''}${g.items.map((e,n)=>{const i=k++;const r=done[i];return`<div class="ex ${r||''}">
+   <div class="q">${n+1}. ${esc(e.q)}</div>
+   <form class="row" data-i="${i}"><input id="in-${esc(l.id)}-${i}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Ответ" value="${esc(vals[i]||'')}"><button class="btn">Проверить</button></form>
+   <div class="fb ${r||''}">${fbText(r,e,i)}</div>${aiBlock(l,i,e)}</div>`}).join('')}`).join('')}
+  <button class="btn ghost" id="reset" style="margin-top:14px">Сбросить ответы урока</button></section></div>`}
+function renderWords(){const w=st.saved[st.lang];
+  if(!w.length)return'<h2>Мои слова</h2><p class="note">Нажми на слово в тексте урока и выбери «В мои слова».</p>';
+  return`<h2>Мои слова · ${w.length}</h2><table><tbody>${w.map((x,i)=>`<tr><td style="font-family:var(--serif);font-size:18px">${esc(x.w)}</td><td>${esc(x.t)}</td><td style="text-align:right"><button class="x" data-del="${i}" aria-label="Удалить">×</button></td></tr>`).join('')}</tbody></table>`}
+function renderImport(){const ls=LESSONS[st.lang];
+  return`<h2>Уроки и аудио · ${esc(NAMES[st.lang][0])}</h2>
+  <div class="box"><label for="file">Файл уроков (.json)</label><input type="file" id="file" accept=".json,application/json" style="min-height:44px">
+  <p class="note">Уроки хранятся только на этом устройстве. Загрузка файла с теми же уроками обновит их, прогресс сохранится.</p></div>
+  ${ls.length?`<h3>Загруженные уроки</h3>${ls.map(l=>`<div class="ex row" style="align-items:center"><span style="flex:1 1 160px">${esc(l.title)}</span>
+   <label class="btn ghost sm" style="margin:0;font-weight:500">${hasAudio.has(l.id)?'Заменить аудио':'Добавить аудио'}<input type="file" accept="audio/*" data-audio="${esc(l.id)}" hidden></label>
+   ${hasAudio.has(l.id)?'<span class="note">аудио есть</span>':''}<button class="x" data-rm="${esc(l.id)}" aria-label="Удалить урок">×</button></div>`).join('')}`:'<p class="note">Пока загружены только демо-уроки.</p>'}`}
+function renderSettings(){const c=st.cfg;
+  return`<h2>Проверка ИИ</h2><p>Свободные ответы (переводы) можно отправить на проверку модели DeepSeek. Без сети ответы ждут в очереди.</p>
+  <form id="cfg" class="box"><label for="c-key">API-ключ DeepSeek</label><input id="c-key" type="password" autocomplete="off" value="${esc(c.key)}" placeholder="sk-…">
+  <label for="c-url">Адрес API</label><input id="c-url" value="${esc(c.url)}">
+  <p class="note">По умолчанию https://api.deepseek.com. Если запросы из браузера не проходят, сюда подставим адрес посредника.</p>
+  <label for="c-model">Модель</label><input id="c-model" value="${esc(c.model)}">
+  <div class="row" style="margin-top:14px"><button class="btn">Сохранить</button><button type="button" class="btn ghost" id="c-test">Проверить связь</button></div><div class="fb" id="c-fb"></div></form>
+  <p class="note">Ключ хранится только на этом устройстве. Не делись ссылкой на настройки и не публикуй ключ.</p>
+  <h2 style="margin-top:28px">Очередь</h2><p>${st.queue.length?`Ждут проверки: ${st.queue.length}. <button class="btn ghost sm" id="flush">Отправить сейчас</button>`:'Очередь пуста.'}</p>
+  <h2 style="margin-top:28px">Резервная копия</h2><p class="note">Прогресс и мои слова, без уроков и аудио.</p>
+  <div class="row"><button class="btn ghost" id="bk-save">Скачать копию</button><label class="btn ghost" style="margin:0;font-weight:500">Восстановить<input type="file" id="bk-load" accept=".json" hidden></label></div>`}
+function render(){
+  document.body.classList.toggle('es',st.lang==='es');document.documentElement.lang=st.lang;
+  $('title').innerHTML=esc(NAMES[st.lang][0])+'<small>'+esc(NAMES[st.lang][1])+'</small>';
+  document.querySelector('meta[name=theme-color]').content=st.lang==='es'?'#c2362b':'#1f4fbf';
+  document.querySelectorAll('.sw button').forEach(b=>b.classList.toggle('on',b.dataset.l===st.lang));
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===st.tab));
+  $('main').innerHTML={read:renderRead,words:renderWords,import:renderImport,settings:renderSettings}[st.tab]();
+  closeSheet();
+  if(st.tab==='read'&&hasAudio.has(cur().id))loadAudio(cur().id);
+}
+async function loadAudio(id){if(!audioUrl[id]){const b=await idb('audio','readonly',s=>s.get(id));if(b)audioUrl[id]=URL.createObjectURL(b)}const a=$('aud');if(a&&audioUrl[id])a.src=audioUrl[id]}
+
+/* ---------- word sheet ---------- */
+let selWord=null;
+function openSheet(k){const d=cur().dict||{};const t=d[k]||d[k.replace(/'$/,'')];
+  selWord={w:k,t:t||'нет в словарике урока'};$('sw-word').textContent=k;$('sw-tr').textContent=selWord.t;
+  const has=st.saved[st.lang].some(x=>x.w===k);$('sw-save').textContent=has?'Уже сохранено':'В мои слова';$('sw-save').disabled=has||!t;
+  $('sheet').classList.add('open')}
+function closeSheet(){$('sheet').classList.remove('open');document.querySelectorAll('.w.sel').forEach(x=>x.classList.remove('sel'))}
+
+/* ---------- AI check ---------- */
+function prompt(item,answer,lang){
+  return[{role:'system',content:`Ты преподаватель языка ${NAMES[lang][2]} для русскоязычной студентки уровня A1–A2. Проверь ответ на упражнение. Ответь строго JSON: {"verdict":"ok"|"minor"|"wrong","correct":"исправленный вариант на изучаемом языке","explain":"1–2 коротких предложения по-русски: в чём ошибка или почему верно"}. "ok" — ответ грамматически верен и передаёт смысл, даже если отличается от эталона. "minor" — смысл верен, мелкая ошибка (ударение, апостроф, артикль, порядок слов). "wrong" — грамматическая или смысловая ошибка.`},
+   {role:'user',content:`Задание: ${item.q}\nЭталонные ответы: ${item.a.join(' | ')}\nОтвет студентки: ${answer}`}]}
+async function askAI(lid,i){
+  const l=[...LESSONS.it,...LESSONS.es,...DEMO.it,...DEMO.es].find(x=>x.id===lid);if(!l)return;
+  const lang=LESSONS.es.concat(DEMO.es).includes(l)?'es':'it';
+  const item=flat(l)[i];const ans=(st.vals[lid]||{})[i];if(!ans)return;
+  st.ai[lid]=st.ai[lid]||{};
+  if(!st.cfg.key){toast('Добавь API-ключ во вкладке «Настройки»');return}
+  if(!navigator.onLine){st.ai[lid][i]='queued';if(!st.queue.some(q=>q.l===lid&&q.i===i))st.queue.push({l:lid,i});save();rerenderEx();return}
+  st.ai[lid][i]='wait';rerenderEx();
+  try{
+    const r=await fetch(st.cfg.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+st.cfg.key},
+      body:JSON.stringify({model:st.cfg.model,messages:prompt(item,ans,lang),response_format:{type:'json_object'},temperature:0.2,max_tokens:300})});
+    if(!r.ok)throw new Error('ответ сервера '+r.status);
+    const j=await r.json();const o=JSON.parse(j.choices[0].message.content);
+    st.ai[lid][i]=o;if(o.verdict==='ok'){st.done[lid]=st.done[lid]||{};st.done[lid][i]='ok'}
+    st.queue=st.queue.filter(q=>!(q.l===lid&&q.i===i));
+  }catch(e){
+    if(e instanceof TypeError){st.ai[lid][i]='queued';if(!st.queue.some(q=>q.l===lid&&q.i===i))st.queue.push({l:lid,i});}
+    else st.ai[lid][i]={error:e.message};
+  }
+  save();rerenderEx();
+}
+async function flushQueue(){const q=[...st.queue];for(const x of q){st.queue=st.queue.filter(y=>y!==x);await askAI(x.l,x.i)}}
+function rerenderEx(){if(st.tab!=='read'&&st.tab!=='settings')return;const y=scrollY;render();scrollTo(0,y)}
+
+/* ---------- events ---------- */
+document.querySelector('.sw').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;st.lang=b.dataset.l;save();render()});
+document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;st.tab=b.dataset.t;save();render();scrollTo(0,0)});
+$('main').addEventListener('click',e=>{
+  const w=e.target.closest('.w');
+  if(w){document.querySelectorAll('.w.sel').forEach(x=>x.classList.remove('sel'));w.classList.add('sel');openSheet(w.dataset.w);return}
+  const c=e.target.closest('[data-les]');if(c){st.les[st.lang]=c.dataset.les;save();render();return}
+  const sh=e.target.closest('[data-show]');if(sh){const it=flat(cur())[+sh.dataset.show];sh.outerHTML='Ответ: <b>'+esc(it.a.join(' / '))+'</b>';return}
+  const ai=e.target.closest('[data-ai]');if(ai){askAI(cur().id,+ai.dataset.ai);return}
+  const d=e.target.closest('[data-del]');if(d){st.saved[st.lang].splice(+d.dataset.del,1);save();render();return}
+  const rm=e.target.closest('[data-rm]');if(rm){const id=rm.dataset.rm;LESSONS[st.lang]=LESSONS[st.lang].filter(l=>l.id!==id);idb('lessons','readwrite',s=>s.put(LESSONS[st.lang],st.lang));idb('audio','readwrite',s=>s.delete(id));hasAudio.delete(id);render();return}
+  if(e.target.id==='reset'){const id=cur().id;delete st.done[id];delete st.vals[id];delete st.ai[id];save();render();return}
+  if(e.target.id==='flush'){flushQueue();return}
+  if(e.target.id==='c-test'){testAI();return}
+  if(e.target.id==='bk-save'){const b=new Blob([JSON.stringify({saved:st.saved,done:st.done,vals:st.vals,ai:st.ai},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='due-lingue-progress.json';a.click();return}
+});
+$('main').addEventListener('submit',e=>{e.preventDefault();const f=e.target;
+  if(f.id==='cfg'){st.cfg={key:$('c-key').value.trim(),url:$('c-url').value.trim()||'https://api.deepseek.com',model:$('c-model').value.trim()||'deepseek-chat'};save();$('c-fb').className='fb ok';$('c-fb').textContent='Сохранено';return}
+  const i=+f.dataset.i;const l=cur();const inp=f.querySelector('input');const all=flat(l);
+  const r=check(all[i],inp.value);if(!r)return;
+  st.done[l.id]=st.done[l.id]||{};st.done[l.id][i]=r;st.vals[l.id]=st.vals[l.id]||{};st.vals[l.id][i]=inp.value;
+  if(st.ai[l.id])delete st.ai[l.id][i];save();
+  const box=f.parentElement;box.className='ex '+r;const fb=box.querySelector('.fb');fb.className='fb '+r;fb.innerHTML=fbText(r,all[i],i);
+  const old=box.querySelector('.ai');if(old)old.remove();
+  const ok=all.filter((x,j)=>st.done[l.id][j]==='ok').length;$('sc').textContent=ok+' из '+all.length;document.querySelector('.bar i').style.width=ok/all.length*100+'%';
+  if(r==='ok'){const nx=$('in-'+l.id+'-'+(i+1));if(nx)nx.focus()}
+});
+$('main').addEventListener('change',async e=>{const t=e.target;
+  if(t.dataset.audio){const f=t.files[0];if(!f)return;await idb('audio','readwrite',s=>s.put(f,t.dataset.audio));delete audioUrl[t.dataset.audio];hasAudio.add(t.dataset.audio);toast('Аудио сохранено в урок');render();return}
+  if(t.id==='bk-load'){try{const j=JSON.parse(await t.files[0].text());Object.assign(st,{saved:j.saved||st.saved,done:j.done||{},vals:j.vals||{},ai:j.ai||{}});save();toast('Прогресс восстановлен');render()}catch(err){toast('Файл не подошёл')}return}
+  if(t.id!=='file')return;
+  try{const j=JSON.parse(await t.files[0].text());const arr=Array.isArray(j)?j:[j];
+    arr.forEach((l,k)=>{if(!l.title||!Array.isArray(l.text))throw new Error('у урока нет title или text');l.id=l.id||st.lang+'-'+Date.now()+'-'+k;l.dict=l.dict||{};l.ex=l.ex||[]});
+    const ids=new Set(arr.map(l=>l.id));const ls=LESSONS[st.lang].filter(l=>!ids.has(l.id)).concat(arr);
+    LESSONS[st.lang]=ls;await idb('lessons','readwrite',s=>s.put(ls,st.lang));
+    st.les[st.lang]=arr[0].id;st.tab='read';save();toast('Загружено уроков: '+arr.length);render()
+  }catch(err){toast('Не получилось прочитать файл: '+err.message)}
+});
+async function testAI(){const fb=$('c-fb');st.cfg={key:$('c-key').value.trim(),url:$('c-url').value.trim(),model:$('c-model').value.trim()};save();
+  fb.className='fb';fb.textContent='Проверяю…';
+  try{const r=await fetch(st.cfg.url.replace(/\/$/,'')+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+st.cfg.key},body:JSON.stringify({model:st.cfg.model,messages:[{role:'user',content:'Скажи "ок".'}],max_tokens:5})});
+    if(!r.ok)throw new Error('сервер ответил '+r.status+(r.status===401?' (неверный ключ)':r.status===402?' (на счёте нет денег)':''));
+    fb.className='fb ok';fb.textContent='Связь есть, ИИ отвечает.'}
+  catch(e){fb.className='fb bad';fb.textContent=e instanceof TypeError?'Запрос не прошёл: похоже, браузер блокирует прямой доступ к API. Понадобится посредник.':'Ошибка: '+e.message}}
+$('sw-save').addEventListener('click',()=>{if(!selWord)return;st.saved[st.lang].push(selWord);save();
+  document.querySelectorAll(`.w[data-w="${CSS.escape(selWord.w)}"]`).forEach(x=>x.classList.add('saved'));$('sw-save').textContent='Сохранено';$('sw-save').disabled=true});
+$('sw-close').addEventListener('click',closeSheet);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+const net=()=>{document.body.classList.toggle('offline',!navigator.onLine);if(navigator.onLine&&st.queue.length)flushQueue()};
+addEventListener('online',net);addEventListener('offline',net);
+
+/* ---------- start ---------- */
+(async()=>{
+  try{for(const l of['it','es']){const v=await idb('lessons','readonly',s=>s.get(l));if(v)LESSONS[l]=v}
+    const keys=await idb('audio','readonly',s=>s.getAllKeys());(keys||[]).forEach(k=>hasAudio.add(k))}catch(e){toast('Хранилище недоступно: уроки не сохранятся')}
+  render();net();
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+}
+</script>
+</body>
+</html>
